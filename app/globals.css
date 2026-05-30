@@ -1,0 +1,433 @@
+@import "tailwindcss";
+
+@theme {
+  /* === Brand Colors — Deep Dark Purple === */
+  --color-primary: #3b1fa8;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #ede9ff;
+  --color-on-primary-container: #1a0072;
+  --color-primary-fixed: #ede9ff;
+  --color-primary-fixed-dim: #c5b8ff;
+  --color-on-primary-fixed: #1a0072;
+  --color-inverse-primary: #c5b8ff;
+
+  --color-secondary: #4a4870;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #ddd8ff;
+  --color-on-secondary-container: #14103a;
+
+  --color-tertiary: #78536b;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #ffd7f1;
+  --color-on-tertiary-container: #2e1126;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #410002;
+
+  --color-background: #fdf8ff;
+  --color-on-background: #14111f;
+  --color-surface: #fdf8ff;
+  --color-on-surface: #14111f;
+  /* Darker for better light-mode log readability (contrast ≥ 4.5:1 on white) */
+  --color-on-surface-variant: #2e2b3b;
+  --color-surface-bright: #fdf8ff;
+  --color-surface-dim: #ded8e1;
+  --color-surface-variant: #ece6f4;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f5f0fd;
+  --color-surface-container: #f0eaf8;
+  --color-surface-container-high: #e9e3f2;
+  --color-surface-container-highest: #e3ddec;
+  --color-inverse-surface: #322f3d;
+  --color-inverse-on-surface: #f5eff7;
+  --color-outline: #5a5475;
+  --color-outline-variant: #c8c1d8;
+  --color-surface-tint: #3b1fa8;
+
+  /* Sidebar brand color */
+  --sidebar-brand-color: #1e0052;
+
+  /* === Font === */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* === Shadows === */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-card: 0 2px 8px rgb(59 31 168 / 0.08), 0 0 1px rgb(59 31 168 / 0.12);
+}
+
+/* ==========================================
+   DARK MODE COLOR OVERRIDES
+   next-themes sets class="dark" on <html>
+   ========================================== */
+
+.dark {
+  --color-primary: #c5c0ff;
+  --color-on-primary: #2a009f;
+  --color-primary-container: #3f35a3;
+  --color-on-primary-container: #e3dfff;
+  --color-primary-fixed: #e3dfff;
+  --color-primary-fixed-dim: #c5c0ff;
+  --color-on-primary-fixed: #140067;
+  --color-inverse-primary: #534ab7;
+
+  --color-secondary: #c4c3dd;
+  --color-on-secondary: #2d2f42;
+  --color-secondary-container: #444559;
+  --color-on-secondary-container: #e1e0f9;
+
+  --color-tertiary: #f0b6da;
+  --color-on-tertiary: #492541;
+  --color-tertiary-container: #623b58;
+  --color-on-tertiary-container: #ffd7f1;
+
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+
+  --color-background: #131318;
+  --color-on-background: #e5e1e9;
+  --color-surface: #131318;
+  --color-on-surface: #e5e1e9;
+  --color-on-surface-variant: #c8c5d0;
+  --color-surface-bright: #39393f;
+  --color-surface-dim: #131318;
+  --color-surface-variant: #46464f;
+  --color-surface-container-lowest: #0e0e13;
+  --color-surface-container-low: #1b1b21;
+  --color-surface-container: #1f1f25;
+  --color-surface-container-high: #292930;
+  --color-surface-container-highest: #34343a;
+  --color-inverse-surface: #e5e1e9;
+  --color-inverse-on-surface: #322f35;
+  --color-outline: #928f9a;
+  --color-outline-variant: #46464f;
+  --color-surface-tint: #c5c0ff;
+
+  /* Sidebar brand color — light purple in dark mode */
+  --sidebar-brand-color: #c5b8ff;
+}
+
+.dark body {
+  color: #e5e1e9;
+  background-color: #131318;
+}
+
+.dark .bg-grid-pattern {
+  background-image:
+    linear-gradient(to right, rgba(197, 192, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(197, 192, 255, 0.04) 1px, transparent 1px);
+}
+
+
+/* ==========================================
+   CUSTOM UTILITY CLASSES
+   Required for font-headline-*, text-*, etc.
+   ========================================== */
+
+@utility font-headline-lg {
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+@utility text-headline-lg {
+  font-size: 28px;
+  line-height: 36px;
+}
+
+@utility font-headline-md {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+@utility text-headline-md {
+  font-size: 20px;
+  line-height: 28px;
+}
+
+@utility font-headline-sm {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+}
+@utility text-headline-sm {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+@utility font-body-lg {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+@utility text-body-lg {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+@utility font-body-md {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+@utility text-body-md {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+@utility font-body-sm {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+}
+@utility text-body-sm {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+@utility font-label-lg {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+@utility text-label-lg {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+@utility font-label-md {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+@utility text-label-md {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+@utility font-label-sm {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+@utility text-label-sm {
+  font-size: 11px;
+  line-height: 16px;
+}
+
+/* ==========================================
+   BASE STYLES
+   ========================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-y: scroll;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #1c1b20;
+  background-color: #fdf8ff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Safe-area insets for notched devices */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Ensure all interactive elements have proper touch targets on mobile */
+@media (pointer: coarse) {
+  button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* Exception for inline text links and small pill badges */
+  a.inline-flex, span.inline-flex, .font-label-sm {
+    min-height: auto;
+    min-width: auto;
+  }
+}
+
+/* Prevent horizontal overflow on all screen sizes */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Responsive headline scaling for small screens */
+@media (max-width: 480px) {
+  .font-headline-lg, .text-headline-lg {
+    font-size: 22px !important;
+    line-height: 30px !important;
+  }
+  .font-headline-md, .text-headline-md {
+    font-size: 17px !important;
+    line-height: 24px !important;
+  }
+}
+
+/* ==========================================
+   MATERIAL SYMBOLS
+   ========================================== */
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+  font-style: normal;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ==========================================
+   BACKGROUND PATTERNS
+   ========================================== */
+
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(83, 74, 183, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(83, 74, 183, 0.05) 1px, transparent 1px);
+}
+
+/* ==========================================
+   SCROLLBAR
+   ========================================== */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cac4d0; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #79747e; }
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in  { animation: fadeIn 0.3s ease both; }
+.animate-slide-up { animation: slideUp 0.4s ease both; }
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+/* Safe-area bottom padding for notched/rounded-corner devices */
+.safe-area-pb {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  height: calc(72px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Thin scrollbar for sidebar and drawers */
+.scrollbar-thin::-webkit-scrollbar { width: 3px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: transparent; border-radius: 9999px; }
+.scrollbar-thin:hover::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+
+.skeleton {
+  background: linear-gradient(90deg, #e6e0e9 25%, #f3edf6 50%, #e6e0e9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* ==========================================
+   CARD SHADOWS
+   ========================================== */
+
+.shadow-card {
+  box-shadow: 0 2px 8px rgba(83, 74, 183, 0.08), 0 0 1px rgba(83, 74, 183, 0.1);
+}
+.shadow-card-hover {
+  box-shadow: 0 4px 16px rgba(83, 74, 183, 0.12), 0 0 1px rgba(83, 74, 183, 0.15);
+}
+
+/* ==========================================
+   STATUS BADGE COLOR TOKENS
+   Pending   → Amber  (#f59e0b family)
+   In Review → Blue   (#3b82f6 family)
+   Resolved  → Green  (#10b981 family)
+   ========================================== */
+
+/* Pending — amber pulse dot */
+@keyframes status-ping {
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+.animate-ping {
+  animation: status-ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Fade-in for toast notifications */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in-up 0.25s ease-out forwards;
+}
+
+/* Status filter button active states */
+.status-pending-active {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+.status-review-active {
+  background: #dbeafe;
+  color: #1e40af;
+  border-color: #93c5fd;
+}
+.status-resolved-active {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #6ee7b7;
+}
+
+/* Dark mode overrides for status colors */
+.dark .status-pending-active {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.dark .status-review-active {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+.dark .status-resolved-active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.3);
+}

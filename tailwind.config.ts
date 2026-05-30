@@ -1,0 +1,93 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  darkMode: "class",
+  content: ["./app/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}"],
+  theme: {
+    extend: {
+      colors: {
+        /* === Brand: Deep Dark Purple === */
+        "primary": "#3b1fa8",
+        "on-primary": "#ffffff",
+        "primary-container": "#ede9ff",
+        "on-primary-container": "#1a0072",
+        "primary-fixed": "#ede9ff",
+        "primary-fixed-dim": "#c5b8ff",
+        "on-primary-fixed": "#1a0072",
+        "on-primary-fixed-variant": "#2f1898",
+        "inverse-primary": "#c5b8ff",
+        "secondary": "#4a4870",
+        "on-secondary": "#ffffff",
+        "secondary-container": "#ddd8ff",
+        "on-secondary-container": "#14103a",
+        "tertiary": "#3f4345",
+        "on-tertiary": "#ffffff",
+        "tertiary-container": "#575a5c",
+        "on-tertiary-container": "#cfd1d3",
+        "error": "#ba1a1a",
+        "on-error": "#ffffff",
+        "error-container": "#ffdad6",
+        "on-error-container": "#93000a",
+        "background": "#fdf8ff",
+        "on-background": "#14111f",
+        "surface": "#fdf8ff",
+        "on-surface": "#14111f",
+        /* Darker for better light-mode log readability */
+        "on-surface-variant": "#2e2b3b",
+        "surface-bright": "#fdf8ff",
+        "surface-dim": "#cfdaf2",
+        "surface-variant": "#ece6f4",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-low": "#f5f0fd",
+        "surface-container": "#f0eaf8",
+        "surface-container-high": "#e9e3f2",
+        "surface-container-highest": "#e3ddec",
+        "inverse-surface": "#322f3d",
+        "inverse-on-surface": "#f5eff7",
+        "outline": "#5a5475",
+        "outline-variant": "#c8c1d8",
+        "surface-tint": "#3b1fa8",
+      },
+      screens: {
+        xs: '380px',
+      },
+      borderRadius: {
+        DEFAULT: "0.25rem",
+        lg: "0.5rem",
+        xl: "0.75rem",
+        full: "9999px",
+      },
+      spacing: {
+        container_padding: "2rem",
+        sidebar_width: "240px",
+        mobile_nav_height: "64px",
+        stack_lg: "2rem",
+        stack_md: "1rem",
+        stack_sm: "0.5rem",
+        gutter: "1.5rem",
+      },
+      fontFamily: {
+        "headline-lg": ["Inter", "sans-serif"],
+        "headline-lg-mobile": ["Inter", "sans-serif"],
+        "headline-md": ["Inter", "sans-serif"],
+        "body-lg": ["Inter", "sans-serif"],
+        "body-md": ["Inter", "sans-serif"],
+        "label-lg": ["Inter", "sans-serif"],
+        "label-md": ["Inter", "sans-serif"],
+      },
+      fontSize: {
+        "headline-lg": ["30px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "headline-lg-mobile": ["24px", { lineHeight: "32px", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "headline-md": ["20px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "600" }],
+        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+        "label-lg": ["14px", { lineHeight: "20px", fontWeight: "600" }],
+        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500" }],
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
+

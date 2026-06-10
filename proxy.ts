@@ -9,10 +9,6 @@ const isProtectedRoute = createRouteMatcher([
   '/settings(.*)',
 ]);
 
-const isAdminRoute = createRouteMatcher([
-  '/admin(.*)',
-]);
-
 const isAuthRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',

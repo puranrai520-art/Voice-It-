@@ -68,12 +68,29 @@ export async function POST(req: Request) {
   if (type === 'user.updated') {
     const supabase = createServerSupabase();
     const email = data.email_addresses?.[0]?.email_address || '';
-    const name = [data.first_name, data.last_name].filter(Boolean).join(' ') || email.split('@')[0];
+    // Only update avatar_url and email from Clerk — do NOT overwrite the
+    // user's custom display name set inside VoiceIt Settings.
     const avatar_url = data.image_url || null;
+
+    // Fetch the current record so we can selectively update
+    const { data: existing } = await supabase
+      .from('users')
+      .select('name, clerk_id')
+      .eq('clerk_id', data.id)
+      .single();
+
+    const clerkName = [data.first_name, data.last_name].filter(Boolean).join(' ') || email.split('@')[0];
+
+    // Only update the name if the user hasn't set a custom one yet
+    // (i.e., the stored name still matches what Clerk would generate)
+    const updatePayload: Record<string, unknown> = { email, avatar_url };
+    if (!existing?.name || existing.name === clerkName) {
+      updatePayload.name = clerkName;
+    }
 
     await supabase
       .from('users')
-      .update({ email, name, avatar_url })
+      .update(updatePayload)
       .eq('clerk_id', data.id);
   }
 

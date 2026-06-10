@@ -163,10 +163,7 @@ export function GamificationBadges({ total, resolved, hasRated, joinedAt }: Gami
 
             {/* Badge icon */}
             <div
-              className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${
-                badge.earned ? '' : badge.bg
-              }`}
-              style={badge.earned ? { background: `linear-gradient(135deg, var(--from), var(--to))` } : {}}
+              className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm"
             >
               {badge.earned ? (
                 <div

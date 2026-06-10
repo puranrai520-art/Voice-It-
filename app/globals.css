@@ -253,16 +253,17 @@ body {
   padding-right: env(safe-area-inset-right);
 }
 
-/* Ensure all interactive elements have proper touch targets on mobile */
+/* Ensure primary interactive elements have proper touch targets on mobile */
 @media (pointer: coarse) {
-  button, a, [role="button"], input[type="checkbox"], input[type="radio"] {
-    min-height: 44px;
-    min-width: 44px;
+  /* Only apply to standalone action buttons/links, not inline or pill elements */
+  button:not(.no-touch-target),
+  [role="button"]:not(.no-touch-target) {
+    min-height: 36px;
   }
-  /* Exception for inline text links and small pill badges */
-  a.inline-flex, span.inline-flex, .font-label-sm {
-    min-height: auto;
-    min-width: auto;
+  /* Checkboxes and radios need larger tap areas */
+  input[type="checkbox"], input[type="radio"] {
+    min-height: 24px;
+    min-width: 24px;
   }
 }
 

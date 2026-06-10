@@ -4,7 +4,6 @@ import { createServerSupabase } from '@/lib/supabase/server';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { MobileTopBar } from '@/components/layout/MobileTopBar';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
-import { Toaster } from '@/components/ui/toaster';
 import { getUnreadCount } from '@/actions/complaints';
 
 import { SidebarProvider } from '@/components/layout/SidebarProvider';

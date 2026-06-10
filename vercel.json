@@ -4,12 +4,6 @@
   "framework": "nextjs",
   "installCommand": "npm install",
   "cleanUrls": true,
-  "trailingSlash": false,
-  "crons": [
-    {
-      "path": "/api/health",
-      "schedule": "*/5 * * * *"
-    }
-  ]
+  "trailingSlash": false
 }
 

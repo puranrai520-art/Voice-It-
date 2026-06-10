@@ -9,6 +9,15 @@ export function createServerSupabase() {
         autoRefreshToken: false,
         persistSession: false,
       },
+      db: {
+        schema: 'public',
+      },
+      global: {
+        headers: {
+          'x-client-info': 'voiceit-server',
+        },
+      },
     }
   );
 }
+

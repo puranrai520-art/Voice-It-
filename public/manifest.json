@@ -1,0 +1,44 @@
+{
+  "name": "VoiceIt",
+  "short_name": "VoiceIt",
+  "description": "College Complaint Management System — Submit, track, and resolve complaints with AI assistance.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#0f0030",
+  "theme_color": "#1e0052",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["productivity", "education"],
+  "icons": [
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "New Complaint",
+      "short_name": "New",
+      "description": "Submit a new complaint",
+      "url": "/complaints/new",
+      "icons": [{ "src": "/icon-512x512.png", "sizes": "512x512" }]
+    },
+    {
+      "name": "My Complaints",
+      "short_name": "Complaints",
+      "description": "View your complaints",
+      "url": "/my-complaints",
+      "icons": [{ "src": "/icon-512x512.png", "sizes": "512x512" }]
+    }
+  ]
+}

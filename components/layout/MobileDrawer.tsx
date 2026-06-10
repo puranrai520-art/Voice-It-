@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 import { VoiceItLogo } from '@/components/shared/VoiceItLogo';
 
 const navItems = [
-  { href: '/', icon: 'home', label: 'Public Home' },
   { href: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
   { href: '/my-complaints', icon: 'assignment', label: 'My Complaints' },
   { href: '/complaints/new', icon: 'add_circle', label: 'New Complaint' },
@@ -16,6 +15,7 @@ const navItems = [
   { href: '/admin/users', icon: 'group', label: 'User Management', adminOnly: true },
   { href: '/settings', icon: 'settings', label: 'Settings' },
 ];
+
 
 export function MobileDrawer({
   role,
@@ -110,7 +110,8 @@ export function MobileDrawer({
         <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto px-3 py-2 scrollbar-thin">
           {navItems.map((item) => {
             if ((item as any).adminOnly && !isAdmin) return null;
-            const active = pathname === item.href || (item.href !== '/' && item.href !== '/dashboard' && item.href !== '/admin' && pathname.startsWith(item.href));
+            const active = pathname === item.href || (item.href !== '/dashboard' && item.href !== '/admin' && pathname.startsWith(item.href));
+
             const showBadge = item.href === '/my-complaints' && unreadCount > 0;
             return (
               <Link

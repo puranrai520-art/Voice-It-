@@ -13,10 +13,16 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: 'VoiceIt — College Complaint Management System',
   description: 'VoiceIt gives every student a direct line to college administration — transparent, trackable, and AI-powered.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'VoiceIt',
+  },
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
+    apple: '/icon-512x512.png',
   },
   openGraph: {
     title: 'VoiceIt — College Complaint Management System',
@@ -27,10 +33,26 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      afterSignOutUrl="/"
+      appearance={{
+        elements: {
+          organizationSwitcher: 'hidden',
+          createOrganizationButton: 'hidden',
+          organizationPreviewButton: 'hidden',
+        },
+      }}
+    >
       <html lang="en" suppressHydrationWarning>
         <head>
           <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+          <link rel="manifest" href="/manifest.json" />
+          <link rel="apple-touch-icon" href="/icon-512x512.png" />
+          <meta name="theme-color" content="#1e0052" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+          <meta name="apple-mobile-web-app-title" content="VoiceIt" />
+          <meta name="mobile-web-app-capable" content="yes" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link
@@ -40,6 +62,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
+          />
+          {/* PWA Service Worker Registration */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `if ('serviceWorker' in navigator) { window.addEventListener('load', function() { navigator.serviceWorker.register('/sw.js').catch(function() {}); }); }`,
+            }}
           />
         </head>
         <body className="font-sans antialiased" suppressHydrationWarning>

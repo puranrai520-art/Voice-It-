@@ -25,13 +25,13 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { href: '/', icon: 'home', label: 'Public Home' },
   { href: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
   { href: '/my-complaints', icon: 'assignment', label: 'My Complaints' },
   { href: '/complaints/new', icon: 'add_circle', label: 'New Complaint' },
   { href: '/admin', icon: 'admin_panel_settings', label: 'Admin Panel', adminOnly: true },
   { href: '/admin/users', icon: 'group', label: 'User Management', adminOnly: true },
 ];
+
 
 export function Sidebar({ role, unreadCount = 0, userName, userAvatar, userEmail }: SidebarProps) {
   const pathname = usePathname();
@@ -45,12 +45,12 @@ export function Sidebar({ role, unreadCount = 0, userName, userAvatar, userEmail
   const isAdmin = role === 'admin';
 
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
     if (href === '/dashboard') return pathname === '/dashboard';
     if (href === '/admin' && pathname === '/admin') return true;
     if (href === '/admin/users' && pathname === '/admin/users') return true;
-    return pathname.startsWith(href) && href !== '/' && href !== '/dashboard' && href !== '/admin';
+    return pathname.startsWith(href) && href !== '/dashboard' && href !== '/admin';
   };
+
 
   return (
     <nav

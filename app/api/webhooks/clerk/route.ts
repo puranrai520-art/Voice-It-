@@ -51,12 +51,16 @@ export async function POST(req: Request) {
     const name = [data.first_name, data.last_name].filter(Boolean).join(' ') || email.split('@')[0];
     const avatar_url = data.image_url || null;
 
+    // Also check ADMIN_EMAIL env — mirrors AppLayout logic
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase().trim();
+    const isAdminEmail = ADMIN_EMAIL && email.toLowerCase() === ADMIN_EMAIL;
+
     const { error } = await supabase.from('users').insert({
       clerk_id: data.id,
       email,
       name,
       avatar_url,
-      role: isFirstUser ? 'admin' : 'student',
+      role: (isFirstUser || isAdminEmail) ? 'admin' : 'student',
     });
 
     if (error) {
@@ -64,6 +68,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
     }
   }
+
 
   if (type === 'user.updated') {
     const supabase = createServerSupabase();

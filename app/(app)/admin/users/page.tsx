@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { createServerSupabase } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/utils';
 import { UserRoleClient } from './UserRoleClient';
+import { CreateStudentButton } from './CreateStudentButton';
 import Link from 'next/link';
 
 export const metadata = {
@@ -23,13 +24,19 @@ export default async function AdminUsersPage() {
 
   if (currentUser?.role !== 'admin') redirect('/dashboard');
 
-  const { data: users } = await supabase
+  // Only show: admins + students created by admin (have a student_id).
+  // This excludes any Clerk self-signup accounts that were not created by admin.
+  const { data: allUsers } = await supabase
     .from('users')
-    .select('id, clerk_id, name, email, avatar_url, role, created_at')
+    .select('id, clerk_id, name, email, avatar_url, role, created_at, student_id')
     .order('created_at', { ascending: true });
 
-  const adminCount = users?.filter((u: any) => u.role === 'admin').length ?? 0;
-  const studentCount = users?.filter((u: any) => u.role === 'student').length ?? 0;
+  const users = allUsers?.filter((u: any) =>
+    u.role === 'admin' || (u.role === 'student' && u.student_id)
+  ) ?? [];
+
+  const adminCount = users.filter((u: any) => u.role === 'admin').length;
+  const studentCount = users.filter((u: any) => u.role === 'student').length;
 
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-5xl mx-auto">
@@ -47,11 +54,11 @@ export default async function AdminUsersPage() {
           </div>
           <h1 className="font-headline-lg text-headline-lg text-on-surface">User Management</h1>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-            Manage roles and permissions for all registered users
+            Showing admin + students created by admin only
           </p>
         </div>
-        {/* Stats chips */}
-        <div className="flex flex-wrap gap-2">
+        {/* Stats chips + Create Student button */}
+        <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 bg-primary/10 text-primary font-label-md text-label-md px-3 py-1.5 rounded-full">
             <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>shield</span>
             {adminCount} Admin{adminCount !== 1 ? 's' : ''}
@@ -64,6 +71,7 @@ export default async function AdminUsersPage() {
             <span className="material-symbols-outlined text-[14px]">group</span>
             {users?.length ?? 0} Total
           </span>
+          <CreateStudentButton />
         </div>
       </div>
 
@@ -139,6 +147,7 @@ export default async function AdminUsersPage() {
               <tr className="border-b border-outline-variant/20 bg-surface-container">
                 <th className="text-left px-5 py-3.5 font-label-lg text-label-lg text-on-surface-variant">User</th>
                 <th className="text-left px-5 py-3.5 font-label-lg text-label-lg text-on-surface-variant">Email</th>
+                <th className="text-left px-5 py-3.5 font-label-lg text-label-lg text-on-surface-variant hidden lg:table-cell">Student ID</th>
                 <th className="text-left px-5 py-3.5 font-label-lg text-label-lg text-on-surface-variant hidden lg:table-cell">Joined</th>
                 <th className="text-left px-5 py-3.5 font-label-lg text-label-lg text-on-surface-variant">Role</th>
               </tr>
@@ -146,9 +155,9 @@ export default async function AdminUsersPage() {
             <tbody>
               {users?.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-5 py-12 text-center">
+                  <td colSpan={5} className="px-5 py-12 text-center">
                     <span className="material-symbols-outlined text-[40px] text-on-surface-variant mb-2 block">group_off</span>
-                    <p className="font-body-md text-body-md text-on-surface-variant">No users found</p>
+                    <p className="font-body-md text-body-md text-on-surface-variant">No admin-created students yet. Use "Create Student" to add one.</p>
                   </td>
                 </tr>
               ) : (
@@ -185,6 +194,15 @@ export default async function AdminUsersPage() {
                       <span className="font-body-md text-body-md text-on-surface-variant text-[13px]">{user.email}</span>
                     </td>
                     <td className="px-5 py-4 hidden lg:table-cell">
+                      {user.student_id ? (
+                        <span className="font-mono text-[12px] bg-surface-container px-2 py-1 rounded-lg text-on-surface border border-outline-variant/20">
+                          {user.student_id}
+                        </span>
+                      ) : (
+                        <span className="text-on-surface-variant text-[12px] italic">Admin account</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-4 hidden lg:table-cell">
                       <span className="font-body-md text-body-md text-on-surface-variant text-[13px]">{formatDate(user.created_at)}</span>
                     </td>
                     <td className="px-5 py-4">
@@ -204,7 +222,7 @@ export default async function AdminUsersPage() {
 
       {/* Help text */}
       <p className="font-body-md text-body-md text-on-surface-variant text-[12px] mt-4 text-center">
-        Admins have full access to the Command Centre. Students can only submit and track complaints.
+        Only admin-created students are listed here. Clerk sign-up accounts are not shown.
       </p>
     </div>
   );

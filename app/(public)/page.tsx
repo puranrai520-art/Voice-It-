@@ -2,9 +2,13 @@ import Link from 'next/link';
 import { VoiceItLogo } from '@/components/shared/VoiceItLogo';
 import { auth } from '@clerk/nextjs/server';
 import { createServerSupabase } from '@/lib/supabase/server';
+import { getStudentSession } from '@/lib/student-session';
 
 export default async function LandingPage() {
-  // Check if user is logged in and get their info
+  // Check if a student is logged in via cookie
+  const studentSession = await getStudentSession();
+
+  // Check if a Clerk (admin/staff) user is logged in
   let loggedInUser: { name: string | null; email: string; role: string } | null = null;
   try {
     const { userId } = await auth();
@@ -23,10 +27,31 @@ export default async function LandingPage() {
 
   const isAdmin = loggedInUser?.role === 'admin';
   const displayName = loggedInUser?.name || loggedInUser?.email?.split('@')[0] || 'User';
+  const studentName = studentSession?.name || studentSession?.studentId || 'Student';
 
   return (
     <div className="min-h-screen bg-background text-on-background font-sans">
-      {/* === NAVBAR === */}
+
+      {/* === STUDENT BACK TO PORTAL BANNER === */}
+      {studentSession && !loggedInUser && (
+        <div className="sticky top-0 z-[60] bg-gradient-to-r from-[#1e0052] via-[#3b1fa8] to-[#6d28d9] text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-8 h-[48px] flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5 text-sm">
+              <span className="material-symbols-outlined text-[18px] text-violet-300" style={{ fontVariationSettings: "'FILL' 1" }}>school</span>
+              <span className="text-white/80">Logged in as <span className="font-semibold text-white">{studentName}</span></span>
+            </div>
+            <Link
+              href="/student/dashboard"
+              className="inline-flex items-center gap-1.5 bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg transition-all active:scale-[0.98]"
+            >
+              <span className="material-symbols-outlined text-[14px]">arrow_back</span>
+              Back to Student Portal
+            </Link>
+          </div>
+        </div>
+      )}
+
+
       <header className="sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-surface-container-high">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 h-[64px] flex items-center justify-between gap-4 sm:gap-8">
           <div className="flex items-center gap-6 sm:gap-10 min-w-0">
@@ -39,14 +64,22 @@ export default async function LandingPage() {
             </nav>
           </div>
 
-          {/* Right side: logged-in user chip OR sign-in buttons */}
+          {/* Right side: student portal / admin dashboard / guest buttons */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {loggedInUser ? (
-              /* ── Logged-in user pill ── */
+            {studentSession && !loggedInUser ? (
+              /* ── Student logged in via cookie ── */
+              <Link
+                href="/student/dashboard"
+                className="inline-flex items-center gap-1.5 font-label-lg text-label-lg px-3 sm:px-4 py-2 text-white rounded-lg hover:opacity-90 active:scale-[0.98] transition-all shadow-sm text-[13px]"
+                style={{ background: 'linear-gradient(135deg, #3b1fa8, #7c3aed)' }}
+              >
+                <span className="material-symbols-outlined text-[16px]">school</span>
+                <span className="hidden sm:inline">Student Portal</span>
+              </Link>
+            ) : loggedInUser ? (
+              /* ── Admin/Clerk user pill ── */
               <div className="flex items-center gap-2 sm:gap-3">
-                {/* User info chip */}
                 <div className="flex items-center gap-2 bg-surface-container border border-outline-variant/30 rounded-full pl-1.5 pr-3 py-1">
-                  {/* Gradient avatar initials */}
                   <div
                     className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-[11px] shrink-0"
                     style={{ background: 'linear-gradient(135deg, #3b1fa8, #7c3aed)' }}
@@ -54,15 +87,10 @@ export default async function LandingPage() {
                     {displayName.slice(0, 2).toUpperCase()}
                   </div>
                   <div className="hidden sm:flex flex-col leading-none min-w-0">
-                    <span className="text-[12px] font-semibold text-on-surface truncate max-w-[120px]">
-                      {displayName}
-                    </span>
-                    <span className="text-[10px] text-on-surface-variant truncate max-w-[120px]">
-                      {loggedInUser.email}
-                    </span>
+                    <span className="text-[12px] font-semibold text-on-surface truncate max-w-[120px]">{displayName}</span>
+                    <span className="text-[10px] text-on-surface-variant truncate max-w-[120px]">{loggedInUser.email}</span>
                   </div>
-                  {/* Role badge */}
-                  {isAdmin ? (
+                  {isAdmin && (
                     <span
                       className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white ml-1"
                       style={{ background: 'linear-gradient(135deg, #3b1fa8, #7c3aed)' }}
@@ -70,14 +98,8 @@ export default async function LandingPage() {
                       <span className="material-symbols-outlined text-[9px]" style={{ fontVariationSettings: "'FILL' 1" }}>shield</span>
                       <span className="hidden xs:inline">Admin</span>
                     </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 ml-1">
-                      <span className="material-symbols-outlined text-[9px]" style={{ fontVariationSettings: "'FILL' 1" }}>school</span>
-                      <span className="hidden xs:inline">Student</span>
-                    </span>
                   )}
                 </div>
-                {/* Go to Dashboard button */}
                 <Link
                   href="/dashboard"
                   className="inline-flex items-center gap-1.5 font-label-lg text-label-lg px-3 sm:px-4 py-2 text-white rounded-lg hover:opacity-90 active:scale-[0.98] transition-all shadow-sm text-[13px]"
@@ -88,20 +110,20 @@ export default async function LandingPage() {
                 </Link>
               </div>
             ) : (
-              /* ── Guest: Sign In + Get Started ── */
+              /* ── Guest ── */
               <>
                 <Link
-                  href="/sign-in"
-                  className="hidden sm:block font-label-lg text-label-lg px-4 py-2 text-primary border border-primary rounded-lg hover:bg-primary-container/20 transition-colors"
+                  href="/student-login"
+                  className="hidden sm:block font-label-lg text-label-lg px-4 py-2 text-primary border border-primary rounded-lg hover:bg-primary-container/20 transition-colors text-sm"
                 >
-                  Sign In
+                  Student Login
                 </Link>
                 <Link
-                  href="/sign-up"
-                  className="font-label-lg text-label-lg px-4 py-2 text-white rounded-lg hover:opacity-90 active:scale-[0.98] transition-all shadow-sm"
+                  href="/sign-in"
+                  className="font-label-lg text-label-lg px-4 py-2 text-white rounded-lg hover:opacity-90 active:scale-[0.98] transition-all shadow-sm text-sm"
                   style={{ background: 'linear-gradient(135deg, #3b1fa8, #7c3aed)' }}
                 >
-                  Get Started
+                  Admin Login
                 </Link>
               </>
             )}
@@ -138,7 +160,18 @@ export default async function LandingPage() {
                   VoiceIt gives every student and staff member a direct line to college administration — transparent, trackable, and AI-powered. No more chasing emails or standing in queues.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  {loggedInUser ? (
+                  {studentSession && !loggedInUser ? (
+                    /* Student logged in */
+                    <Link
+                      href="/student/dashboard"
+                      className="inline-flex items-center gap-2 font-label-lg text-label-lg px-7 py-3.5 text-white rounded-lg shadow-md hover:opacity-90 active:scale-[0.98] transition-all"
+                      style={{ background: 'linear-gradient(135deg, #3b1fa8, #7c3aed)' }}
+                    >
+                      <span className="material-symbols-outlined text-[18px]">school</span>
+                      Back to Student Portal
+                    </Link>
+                  ) : loggedInUser ? (
+                    /* Admin/Clerk logged in */
                     <Link
                       href="/dashboard"
                       className="inline-flex items-center gap-2 font-label-lg text-label-lg px-7 py-3.5 text-white rounded-lg shadow-md hover:opacity-90 active:scale-[0.98] transition-all"
@@ -148,20 +181,22 @@ export default async function LandingPage() {
                       <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                     </Link>
                   ) : (
+                    /* Guest */
                     <>
                       <Link
-                        href="/sign-up"
+                        href="/student-login"
                         className="inline-flex items-center gap-2 font-label-lg text-label-lg px-7 py-3.5 text-white rounded-lg shadow-md hover:opacity-90 active:scale-[0.98] transition-all"
                         style={{ background: 'linear-gradient(135deg, #3b1fa8, #7c3aed)' }}
                       >
-                        Get Started Free
-                        <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                        <span className="material-symbols-outlined text-[18px]">school</span>
+                        Student Login
                       </Link>
                       <Link
                         href="/sign-in"
                         className="inline-flex items-center gap-2 font-label-lg text-label-lg px-7 py-3.5 text-primary border-[1.5px] border-primary rounded-lg hover:bg-surface-container-high transition-colors"
                       >
-                        Sign In
+                        <span className="material-symbols-outlined text-[18px]">admin_panel_settings</span>
+                        Admin Login
                       </Link>
                     </>
                   )}
@@ -360,7 +395,15 @@ export default async function LandingPage() {
             <p className="text-white/80 font-body-lg text-body-lg mb-8">
               Start resolving complaints faster, with full transparency and AI assistance.
             </p>
-            {loggedInUser ? (
+            {studentSession && !loggedInUser ? (
+              <Link
+                href="/student/dashboard"
+                className="inline-flex items-center gap-2 font-label-lg text-label-lg px-8 py-4 bg-white text-primary rounded-lg shadow-sm hover:bg-surface-container-low active:scale-[0.98] transition-all"
+              >
+                <span className="material-symbols-outlined text-[18px]">school</span>
+                Back to Student Portal
+              </Link>
+            ) : loggedInUser ? (
               <Link
                 href="/dashboard"
                 className="inline-flex items-center gap-2 font-label-lg text-label-lg px-8 py-4 bg-white text-primary rounded-lg shadow-sm hover:bg-surface-container-low active:scale-[0.98] transition-all"
@@ -369,13 +412,22 @@ export default async function LandingPage() {
                 <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
               </Link>
             ) : (
-              <Link
-                href="/sign-up"
-                className="inline-flex items-center gap-2 font-label-lg text-label-lg px-8 py-4 bg-surface-container-lowest text-primary rounded-lg shadow-sm hover:bg-surface-container-low active:scale-[0.98] transition-all"
-              >
-                Get Started Free
-                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-              </Link>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <Link
+                  href="/student-login"
+                  className="inline-flex items-center gap-2 font-label-lg text-label-lg px-8 py-4 bg-white text-primary rounded-lg shadow-sm hover:bg-surface-container-low active:scale-[0.98] transition-all"
+                >
+                  <span className="material-symbols-outlined text-[18px]">school</span>
+                  Student Login
+                </Link>
+                <Link
+                  href="/sign-in"
+                  className="inline-flex items-center gap-2 font-label-lg text-label-lg px-8 py-4 bg-white/15 border border-white/30 text-white rounded-lg hover:bg-white/25 active:scale-[0.98] transition-all"
+                >
+                  <span className="material-symbols-outlined text-[18px]">admin_panel_settings</span>
+                  Admin Login
+                </Link>
+              </div>
             )}
           </div>
         </section>

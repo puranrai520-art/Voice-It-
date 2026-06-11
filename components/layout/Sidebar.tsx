@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { VoiceItLogo } from '@/components/shared/VoiceItLogo';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { useSidebar } from '@/components/layout/SidebarProvider';
+import { PWAInstallButton } from '@/components/layout/PWAInstallButton';
 
 interface SidebarProps {
   role?: string;
@@ -171,6 +172,8 @@ export function Sidebar({ role, unreadCount = 0, userName, userAvatar, userEmail
 
       {/* Footer: Settings + Logout + User */}
       <div className={cn('flex flex-col pt-4 border-t border-outline-variant/30', isCollapsed ? 'gap-4 items-center' : 'gap-1')}>
+        {/* PWA Install button */}
+        <PWAInstallButton isCollapsed={isCollapsed} />
         <Link
           href="/settings"
           className={cn(

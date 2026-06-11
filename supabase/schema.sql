@@ -8,6 +8,27 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- =====================
+-- STUDENT CMS ADDITIONS (v4)
+-- Run this block after the base schema to add new columns safely
+-- =====================
+
+-- Student login credentials & academic details
+ALTER TABLE users ADD COLUMN IF NOT EXISTS student_id TEXT UNIQUE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS branch TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS semester TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
+
+-- Complaint stage-specific fields
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS in_review_image_url TEXT;
+ALTER TABLE complaints ADD COLUMN IF NOT EXISTS resolution_steps TEXT;
+
+-- Indexes for new columns
+CREATE INDEX IF NOT EXISTS users_student_id_idx ON users(student_id);
+
+-- Make clerk_id nullable to support DB-only students (no Clerk account)
+ALTER TABLE users ALTER COLUMN clerk_id DROP NOT NULL;
+
+-- =====================
 -- USERS TABLE
 -- =====================
 CREATE TABLE IF NOT EXISTS users (

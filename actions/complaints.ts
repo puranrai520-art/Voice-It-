@@ -98,6 +98,108 @@ export async function createComplaint(formData: FormData) {
   redirect('/my-complaints');
 }
 
+export async function deleteComplaint(complaintId: string) {
+  const { userId } = await auth();
+  if (!userId) throw new Error('Unauthorized');
+
+  const supabase = createServerSupabase();
+  const { data: user } = await supabase
+    .from('users')
+    .select('id, role')
+    .eq('clerk_id', userId)
+    .single();
+
+  if (!user) throw new Error('User not found');
+
+  // Fetch complaint to check ownership
+  const { data: complaint } = await supabase
+    .from('complaints')
+    .select('id, user_id, status, image_url')
+    .eq('id', complaintId)
+    .single();
+
+  if (!complaint) throw new Error('Complaint not found');
+
+  // Students can only delete their own complaints
+  if (user.role !== 'admin' && complaint.user_id !== user.id) {
+    throw new Error('Forbidden: Not your complaint');
+  }
+
+  // Delete image from storage if present
+  if (complaint.image_url) {
+    try {
+      const url = new URL(complaint.image_url);
+      const pathParts = url.pathname.split('/complaint-images/');
+      if (pathParts[1]) {
+        await supabase.storage.from('complaint-images').remove([pathParts[1].split('?')[0]]);
+      }
+    } catch { /* ignore storage errors */ }
+  }
+
+  // Delete associated comments first
+  await supabase.from('complaint_comments').delete().eq('complaint_id', complaintId);
+
+  const { error } = await supabase.from('complaints').delete().eq('id', complaintId);
+  if (error) throw new Error('Failed to delete complaint: ' + error.message);
+
+  revalidatePath('/my-complaints');
+  revalidatePath('/admin');
+  revalidatePath('/dashboard');
+}
+
+export async function updateComplaint(
+  complaintId: string,
+  data: { title: string; description: string; category: string; complaint_type: string }
+) {
+  const { userId } = await auth();
+  if (!userId) throw new Error('Unauthorized');
+
+  const supabase = createServerSupabase();
+  const { data: user } = await supabase
+    .from('users')
+    .select('id, role')
+    .eq('clerk_id', userId)
+    .single();
+
+  if (!user) throw new Error('User not found');
+
+  const { data: complaint } = await supabase
+    .from('complaints')
+    .select('id, user_id, status')
+    .eq('id', complaintId)
+    .single();
+
+  if (!complaint) throw new Error('Complaint not found');
+
+  // Students can only edit their own complaints (not Resolved ones)
+  if (user.role !== 'admin') {
+    if (complaint.user_id !== user.id) throw new Error('Forbidden: Not your complaint');
+    if (complaint.status === 'Resolved') throw new Error('Cannot edit a resolved complaint');
+  }
+
+  if (!data.title?.trim()) throw new Error('Title is required');
+  if (!data.description?.trim() || data.description.trim().length < 10)
+    throw new Error('Description must be at least 10 characters');
+  if (!data.category?.trim()) throw new Error('Category is required');
+
+  const { error } = await supabase
+    .from('complaints')
+    .update({
+      title: data.title.trim(),
+      description: data.description.trim(),
+      category: data.category,
+      complaint_type: data.complaint_type,
+    })
+    .eq('id', complaintId);
+
+  if (error) throw new Error('Failed to update complaint: ' + error.message);
+
+  revalidatePath(`/complaints/${complaintId}`);
+  revalidatePath('/my-complaints');
+  revalidatePath('/admin');
+}
+
+
 export async function updateComplaintStatus(complaintId: string, status: string) {
   const { userId } = await auth();
   if (!userId) throw new Error('Unauthorized');
@@ -289,3 +391,51 @@ export async function getComplaintComments(complaintId: string) {
   if (error) return [];
   return data || [];
 }
+
+/** Admin: update complaint status with optional reply, resolution steps */
+export async function updateComplaintStatusWithDetails(
+  complaintId: string,
+  data: {
+    status: string;
+    admin_reply?: string;
+    resolution_steps?: string;
+    in_review_image_url?: string;
+  }
+) {
+  'use server';
+  const { userId } = await auth();
+  if (!userId) throw new Error('Unauthorized');
+
+  const supabase = createServerSupabase();
+  const { data: user } = await supabase
+    .from('users')
+    .select('role')
+    .eq('clerk_id', userId)
+    .single();
+
+  if (user?.role !== 'admin') throw new Error('Forbidden');
+
+  const validStatuses = ['Pending', 'In Review', 'Resolved'];
+  if (!validStatuses.includes(data.status)) throw new Error('Invalid status');
+
+  const updatePayload: Record<string, any> = {
+    status: data.status,
+    is_read: false,
+  };
+
+  if (data.admin_reply !== undefined) updatePayload.admin_reply = data.admin_reply;
+  if (data.resolution_steps !== undefined) updatePayload.resolution_steps = data.resolution_steps;
+  if (data.in_review_image_url !== undefined) updatePayload.in_review_image_url = data.in_review_image_url;
+
+  const { error } = await supabase
+    .from('complaints')
+    .update(updatePayload)
+    .eq('id', complaintId);
+
+  if (error) throw new Error('Failed to update complaint: ' + error.message);
+
+  revalidatePath(`/complaints/${complaintId}`);
+  revalidatePath('/admin');
+  revalidatePath('/dashboard');
+}
+

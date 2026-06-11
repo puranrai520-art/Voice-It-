@@ -19,7 +19,7 @@ export interface TeacherDetails {
 
 export interface User {
   id: string;
-  clerk_id: string;
+  clerk_id: string | null;
   email: string;
   name: string | null;
   avatar_url: string | null;
@@ -28,6 +28,11 @@ export interface User {
   email_notifications: boolean;
   student_details: StudentDetails | null;
   teacher_details: TeacherDetails | null;
+  // Student-specific auth fields (set by admin)
+  student_id: string | null;
+  branch: string | null;
+  semester: string | null;
+  password_hash: string | null;
   created_at: string;
 }
 
@@ -47,9 +52,11 @@ export interface Complaint {
   rating: number | null;
   ai_reply: string | null;
   admin_reply: string | null;
+  in_review_image_url: string | null;
+  resolution_steps: string | null;
   is_read: boolean;
   created_at: string;
-  user?: User;
+  user?: Partial<User>;
 }
 
 export interface ComplaintComment {
@@ -67,3 +74,12 @@ export interface CategoryCount {
   category: string;
   count: number;
 }
+
+// Student session payload stored in JWT cookie
+export interface StudentSession {
+  userId: string;
+  studentId: string;
+  email: string;
+  name: string | null;
+}
+

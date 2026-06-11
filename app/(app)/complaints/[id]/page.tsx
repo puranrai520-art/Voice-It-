@@ -9,6 +9,8 @@ import { ComplaintComments } from '@/components/complaints/ComplaintComments';
 import Link from 'next/link';
 import { markComplaintRead, getComplaintComments } from '@/actions/complaints';
 import { StarRating } from '@/components/complaints/StarRating';
+import { DeleteComplaintButton } from './DeleteComplaintButton';
+
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -86,16 +88,38 @@ export default async function ComplaintDetailPage({
               </span>
             </div>
           </div>
-          {complaint.priority && (
-            <div className="shrink-0">
-              <p className="font-label-md text-label-md text-on-surface-variant mb-1">Priority</p>
-              <PriorityStars priority={complaint.priority} size="md" />
-            </div>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            {complaint.priority && (
+              <div className="mr-1">
+                <p className="font-label-md text-label-md text-on-surface-variant mb-1">Priority</p>
+                <PriorityStars priority={complaint.priority} size="md" />
+              </div>
+            )}
+            {/* Edit button — students: own non-resolved; admins: all */}
+            {(isAdmin || (complaint.user_id === currentUser.id && complaint.status !== 'Resolved')) && (
+              <Link
+                href={`/complaints/${complaint.id}/edit`}
+                id="edit-complaint-btn"
+                className="inline-flex items-center gap-1.5 font-label-lg text-label-lg px-3 py-2 rounded-xl border border-outline-variant/30 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all text-[13px]"
+              >
+                <span className="material-symbols-outlined text-[16px]">edit</span>
+                <span className="hidden sm:inline">Edit</span>
+              </Link>
+            )}
+            {/* Delete button — admin only */}
+            {isAdmin && (
+              <DeleteComplaintButton
+                complaintId={complaint.id}
+                isAdmin={isAdmin}
+                redirectTo="/admin"
+              />
+            )}
+          </div>
         </div>
 
         {/* Student info (admin only) */}
         {isAdmin && complaint.user && (
+
           <div className="flex items-center gap-3 mb-4 pb-4 border-b border-outline-variant/20">
             {complaint.user.avatar_url ? (
               <img src={complaint.user.avatar_url} alt={complaint.user.name} className="w-8 h-8 rounded-full" />

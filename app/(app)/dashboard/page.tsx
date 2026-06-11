@@ -13,76 +13,158 @@ export const metadata = {
 
 function ProfileCompleteness({ user }: { user: any }) {
   const checks = [
-    { label: 'Profile photo uploaded', done: !!user.avatar_url },
-    { label: 'Display name set', done: !!user.name },
     {
-      label: user.role === 'admin' ? 'Staff details filled' : 'Student details filled',
-      done: user.role === 'admin' ? !!user.teacher_details?.department : !!user.student_details?.roll_number,
+      label: 'Upload profile photo',
+      done: !!user.avatar_url,
+      icon: 'photo_camera',
+    },
+    {
+      label: 'Set your display name',
+      done: !!user.name,
+      icon: 'badge',
+    },
+    {
+      label: user.role === 'admin' ? 'Add staff details' : 'Add student details',
+      done: user.role === 'admin'
+        ? !!user.teacher_details?.department
+        : !!user.student_details?.roll_number,
+      icon: user.role === 'admin' ? 'work' : 'school',
     },
   ];
+
   const completedCount = checks.filter((c) => c.done).length;
   const pct = Math.round((completedCount / checks.length) * 100);
   if (pct === 100) return null;
 
+  // Circular progress SVG
+  const r = 20;
+  const circ = 2 * Math.PI * r;
+  const strokeOffset = circ - (pct / 100) * circ;
+
   return (
-    <div className="bg-gradient-to-br from-[#1e0052]/5 to-[#3b1fa8]/5 border border-[#1e0052]/15 rounded-2xl p-5 mb-6 animate-fade-in">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span
-            className="material-symbols-outlined text-[18px] text-[#1e0052]"
-            style={{ fontVariationSettings: "'FILL' 1" }}
+    <div className="relative mb-6 rounded-2xl overflow-hidden border border-violet-200/60 dark:border-violet-800/30 bg-gradient-to-br from-violet-50 via-indigo-50 to-purple-50 dark:from-[#1a0044]/70 dark:via-[#200055]/60 dark:to-[#2d0080]/50 shadow-sm">
+      {/* Decorative blobs */}
+      <div className="absolute -top-8 -right-8 w-28 h-28 bg-violet-400/10 rounded-full pointer-events-none" />
+      <div className="absolute -bottom-5 -left-5 w-20 h-20 bg-indigo-400/8 rounded-full pointer-events-none" />
+
+      <div className="relative p-4 sm:p-5">
+
+        {/* ── Header: ring + title + CTA button ── */}
+        <div className="flex items-center gap-3 mb-4">
+
+          {/* Circular SVG progress ring */}
+          <div className="relative shrink-0 w-[56px] h-[56px]">
+            <svg className="w-[56px] h-[56px] -rotate-90" viewBox="0 0 48 48">
+              {/* Track */}
+              <circle cx="24" cy="24" r={r} fill="none" stroke="#c4b5fd" strokeWidth="4" opacity="0.35" />
+              {/* Progress arc */}
+              <circle
+                cx="24" cy="24" r={r}
+                fill="none"
+                stroke="url(#profGrad)"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray={circ}
+                strokeDashoffset={strokeOffset}
+                style={{ transition: 'stroke-dashoffset 0.9s cubic-bezier(.4,0,.2,1)' }}
+              />
+              <defs>
+                <linearGradient id="profGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#3b1fa8" />
+                  <stop offset="100%" stopColor="#7c3aed" />
+                </linearGradient>
+              </defs>
+            </svg>
+            {/* Percentage label inside ring */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-[13px] font-extrabold text-[#3b1fa8] dark:text-violet-300 leading-none">
+                {pct}%
+              </span>
+            </div>
+          </div>
+
+          {/* Title & subtitle */}
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-[14px] sm:text-[15px] text-[#1e0052] dark:text-violet-100 leading-snug">
+              Complete your profile
+            </p>
+            <p className="text-[11px] sm:text-[12px] text-indigo-500/80 dark:text-violet-400/80 mt-0.5">
+              {checks.length - completedCount} step{checks.length - completedCount !== 1 ? 's' : ''} remaining
+            </p>
+          </div>
+
+          {/* CTA */}
+          <Link
+            href="/settings"
+            id="profile-complete-settings-btn"
+            className="shrink-0 inline-flex items-center gap-1.5 bg-[#1e0052] hover:bg-[#3b1fa8] text-white text-[11px] sm:text-[12px] font-semibold px-3 py-2 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95"
           >
-            account_circle
-          </span>
-          <p className="font-label-lg text-label-lg text-on-surface">Complete your profile</p>
+            <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+              manage_accounts
+            </span>
+            <span>Setup</span>
+          </Link>
         </div>
-        <span className="font-label-lg text-label-lg text-[#1e0052] font-bold">{pct}%</span>
-      </div>
-      {/* Progress bar */}
-      <div className="w-full bg-outline-variant/20 rounded-full h-1.5 mb-4">
-        <div
-          className="bg-[#1e0052] h-1.5 rounded-full transition-all duration-700"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <div className="flex flex-col gap-2">
-        {checks.map((c) => (
-          <div key={c.label} className="flex items-center gap-2">
+
+        {/* ── Steps list ── */}
+        <div className="flex flex-col gap-2">
+          {checks.map((c) => (
             <div
-              className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                c.done ? 'bg-emerald-500' : 'bg-surface-container-high border border-outline-variant/40'
+              key={c.label}
+              className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 border transition-colors ${
+                c.done
+                  ? 'bg-emerald-50/80 dark:bg-emerald-900/20 border-emerald-200/70 dark:border-emerald-700/30'
+                  : 'bg-white/70 dark:bg-white/5 border-violet-200/50 dark:border-violet-700/20'
               }`}
             >
-              {c.done && (
+              {/* Step icon bubble */}
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
+                  c.done
+                    ? 'bg-emerald-500'
+                    : 'bg-violet-100 dark:bg-violet-900/40'
+                }`}
+              >
                 <span
-                  className="material-symbols-outlined text-[12px] text-white"
+                  className={`material-symbols-outlined text-[14px] ${
+                    c.done ? 'text-white' : 'text-[#3b1fa8] dark:text-violet-300'
+                  }`}
                   style={{ fontVariationSettings: "'FILL' 1" }}
                 >
-                  check
+                  {c.done ? 'check' : c.icon}
+                </span>
+              </div>
+
+              {/* Label */}
+              <p
+                className={`flex-1 min-w-0 text-[12px] sm:text-[13px] font-medium truncate ${
+                  c.done
+                    ? 'text-emerald-700 dark:text-emerald-400 line-through opacity-60'
+                    : 'text-[#1e0052] dark:text-violet-100'
+                }`}
+              >
+                {c.label}
+              </p>
+
+              {/* Status badge */}
+              {c.done ? (
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded-full shrink-0">
+                  Done
+                </span>
+              ) : (
+                <span className="text-[10px] font-semibold text-violet-600 dark:text-violet-400 bg-violet-100/80 dark:bg-violet-900/30 px-1.5 py-0.5 rounded-full shrink-0 whitespace-nowrap">
+                  Pending
                 </span>
               )}
             </div>
-            <p
-              className={`font-body-md text-body-md ${
-                c.done ? 'text-on-surface-variant line-through opacity-60' : 'text-on-surface'
-              }`}
-            >
-              {c.label}
-            </p>
-            {!c.done && (
-              <Link
-                href="/settings"
-                className="ml-auto font-label-md text-label-md text-[#1e0052] hover:underline text-[11px]"
-              >
-                Fix →
-              </Link>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
+
       </div>
     </div>
   );
 }
+
 
 export default async function DashboardPage() {
   const { userId } = await auth();

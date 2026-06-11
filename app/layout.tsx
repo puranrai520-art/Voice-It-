@@ -8,6 +8,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: 'cover',
+  themeColor: '#1e0052',
 };
 
 export const metadata: Metadata = {
@@ -20,9 +21,16 @@ export const metadata: Metadata = {
     title: 'VoiceIt',
   },
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
     shortcut: '/favicon.svg',
-    apple: '/icon-512x512.png',
+    apple: [
+      { url: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
   },
   openGraph: {
     title: 'VoiceIt — College Complaint Management System',
@@ -45,14 +53,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <html lang="en" suppressHydrationWarning>
         <head>
+          {/* Favicon */}
           <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+          <link rel="icon" href="/icon-192x192.png" sizes="192x192" type="image/png" />
+
+          {/* PWA manifest — required for Android install prompt */}
           <link rel="manifest" href="/manifest.json" />
+
+          {/* Apple / iOS PWA */}
           <link rel="apple-touch-icon" href="/icon-512x512.png" />
-          <meta name="theme-color" content="#1e0052" />
+          <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.png" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
           <meta name="apple-mobile-web-app-title" content="VoiceIt" />
+
+          {/* Android / Chrome PWA */}
           <meta name="mobile-web-app-capable" content="yes" />
+          <meta name="theme-color" content="#1e0052" media="(prefers-color-scheme: dark)" />
+          <meta name="theme-color" content="#1e0052" media="(prefers-color-scheme: light)" />
+          <meta name="application-name" content="VoiceIt" />
+
+          {/* Fonts */}
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link
@@ -63,10 +84,30 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
           />
+
           {/* PWA Service Worker Registration */}
           <script
             dangerouslySetInnerHTML={{
-              __html: `if ('serviceWorker' in navigator) { window.addEventListener('load', function() { navigator.serviceWorker.register('/sw.js').catch(function() {}); }); }`,
+              __html: `
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .then(function(reg) {
+        // Store the install prompt event for use in UI
+        window.addEventListener('beforeinstallprompt', function(e) {
+          e.preventDefault();
+          window.__pwaInstallPrompt = e;
+          // Dispatch a custom event so UI components can react
+          window.dispatchEvent(new CustomEvent('pwaInstallReady'));
+        });
+        window.addEventListener('appinstalled', function() {
+          window.__pwaInstallPrompt = null;
+          window.dispatchEvent(new CustomEvent('pwaInstalled'));
+        });
+      })
+      .catch(function() {});
+  });
+}`,
             }}
           />
         </head>

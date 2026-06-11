@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useClerk } from '@clerk/nextjs';
 import { cn } from '@/lib/utils';
 import { VoiceItLogo } from '@/components/shared/VoiceItLogo';
+import { PWAInstallButton } from '@/components/layout/PWAInstallButton';
 
 const navItems = [
   { href: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
@@ -148,8 +149,10 @@ export function MobileDrawer({
           })}
         </nav>
 
-        {/* Sign Out */}
-        <div className="px-3 pb-6 pt-3 border-t border-outline-variant/20">
+        {/* Sign Out + Install */}
+        <div className="px-3 pb-6 pt-3 border-t border-outline-variant/20 flex flex-col gap-2">
+          {/* PWA Install Button */}
+          <PWAInstallButton isCollapsed={false} />
           <button
             onClick={() => signOut({ redirectUrl: '/' })}
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl font-label-lg text-on-surface-variant hover:bg-surface-container-high transition-colors text-error"
